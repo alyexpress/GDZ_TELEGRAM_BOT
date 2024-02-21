@@ -1,0 +1,41 @@
+{
+  "Version": 2.2,
+  "Release": "baikal",
+
+  "BOT_TOKEN": "",
+  "BOT_OWNERS": [1115575390],
+  "AD_MESSAGE": "💸 <b>Не забудь <a href=\"https://www.tinkoff.ru/cf/6cqRVvB73E8\">поддержать разработчика</a>!\nА то он останется без хлеба...</b>",
+  "DEBUG": false,
+  "ITEMS": {
+    "алгебра": {"url": "https://gdz.ru/class-8/algebra/makarychev-uglublennoe-izuchenie/****-nom/",
+      "sign": "📚", "get": "№", "site": "gdz", "ed": "18"},
+    "геометрия": {"url": "https://gdz.ru/class-8/geometria/atanasyan-8/****-task/",
+      "sign": "📐", "get": "№", "site": "gdz", "ed": "18"},
+    "русский": {"url": ["https://otvetkin.info/files/64/****.png", "https://otvetkin.info/files/64/pro/****.png"],
+      "sign": "✏️", "get": "№", "site": false},
+    "английский учебник": {"url": "https://gdz.ru/class-8/english/starlight-baranova/****-s/",
+      "sign": "🇬🇧", "get": "стр. ", "site": "gdz", "ed": "23"},
+    "английский тетрадь": {"url": "https://gdz.ru/class-8/english/workbook-starlight-baranova/****-s/",
+      "sign": "🇬🇧", "get": "стр. ", "site": "gdz"},
+    "география": {"url": "https://reshak.ru/otvet/reshebniki.php?otvet=****&predmet=alexeev_nizovcev8",
+      "sign": "🌍", "get": "§", "site": "reshak"},
+    "история": {"url": "https://reshak.ru/otvet/reshebniki.php?otvet=****&predmet=arsentev8",
+      "sign": "⏳", "get": "§", "site": "reshak"},
+    "обществознание": {"url": "https://reshak.ru/otvet/reshebniki.php?otvet=****&predmet=bogolubov8",
+      "sign": "👥", "get": "§", "site": "reshak"},
+    "_химия": {"url": "https://reshak.ru/otvet/reshebniki.php?otvet=par/1/4&predmet=eremin8",
+      "sign": "🧪", "get": ["§", "№"], "site": "reshak"}
+  },
+  "GET": {
+    "№": ["номера", "номер"],
+    "стр. ": ["номера страниц", "номер страницы"],
+    "§": ["номер параграфа", "номер параграфа"]
+  },
+  "SITES": {
+    "gdz": {"type": "img", "alt": "ГДЗ", "src": "//gdz.ru/", "prefix": "https:"},
+    "otvetkin": {"type": "img", "alt": "Фото решения", "prefix": "https://otvetkin.info"},
+    "euroki": {"type": "text", "_text": "Содержание\n", "text_": "\nСкачать ответ", "start": "1. ",
+      "remove": "Сократить Перефразировать Добавить текст Вернуть оригинал"},
+    "reshak": {"type": "img", "alt": ["Изображение", "Дополнительное"], "src": "/reshebniki", "prefix": "https://reshak.ru"}
+  }
+}
