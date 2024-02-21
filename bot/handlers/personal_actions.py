@@ -31,19 +31,18 @@ async def start(message: types.Message):
     sleep(1)
     await message.bot.send_message(message.from_user.id, "⤵️ Выберите предмет:", reply_markup=kb)
     db.set_ad(message.from_user.id)
-    db.set(message.from_user.id, "item", None)
+    db.reset(message.from_user.id)
 
 
 @dp.message_handler(commands="stop")
 async def stop(message: types.Message):
     await message.bot.send_message(message.from_user.id, "⤵️ Выберите предмет:", reply_markup=kb)
-    db.set(message.from_user.id, "item", None)
+    db.reset(message.from_user.id)
 
 
 @dp.message_handler(is_owner=True, commands="post")
 async def post(message: types.Message):
-    await message.reply("Ok")
-    if db.ad(message.from_user.id): await message.reply("ad")
+    db.reset(message.from_user.id)
 
 
 @dp.message_handler()
@@ -56,19 +55,33 @@ async def other(message: types.Message):
             db.set(message.from_user.id, "item", item)
             try:
                 if type(parsing.ITEMS[item]['get']) is list:
-                    get = [parsing.ITEMS[item]['get'][0]] + GET[parsing.ITEMS[item]['get'][0]]
+                    get = []
+                    for j in parsing.ITEMS[item]['get']: get.extend([j] + GET[j])
                 else: get = [parsing.ITEMS[item]['get']] + GET[parsing.ITEMS[item]['get']]
-            except: get = GET[list(GET.keys())[0]]
+            except: get = [list(GET.keys())[0]] + GET[list(GET.keys())[0]]
             db.set(message.from_user.id, "get", get)
-            await message.reply(f"Напишите {get[1]}:", reply_markup=get_kb(item, get))
+            request = f"{get[2]}, {get[4]}" if len(get) > 3 else get[1]
+            await message.reply(f"Напишите {request}:", reply_markup=get_kb(item, get))
     else:
         item = db.get(message.from_user.id, "item")
         nums = findall(r"\d+", message.text)
+        _num = db.get(message.from_user.id, "_num")
         allow_ad, get = False, db.get(message.from_user.id, "get")
+        if len(get) > 3 and not _num:
+            if len(nums) > 1: _num, nums = nums[0], nums[1:]
+            elif len(nums) == 1:
+                db.set(message.from_user.id, "_num", nums[0])
+                await message.reply(f"Напишите {get[4]}:", reply=False)
+                return
+            else:
+                await message.reply(f"🧐 Это не похоже на {get[2]}, чтобы остановиться нажми на /stop")
+                return
+
         if not nums:
             item = get_item(message)
             if item not in parsing.ITEMS:
-                await message.reply(f"🧐 Это не похоже на {get[2]}, чтобы остановиться нажми на /stop")
+                request = get[4] if _num else get[2]
+                await message.reply(f"🧐 Это не похоже на {request}, чтобы остановиться нажми на /stop")
             else:
                 db.set(message.from_user.id, "item", None)
                 await other(message)
@@ -76,33 +89,42 @@ async def other(message: types.Message):
         elif not parsing.ITEMS[item]['site']:
             # if in settings file parameter site is false
             for num in nums:
-                media, title = [], f"{item.capitalize()} {get[0]}{num}"
+                sign = get[3] if _num else get[0]
+                media, title = [], f"{item.capitalize()} {sign}{num}"
                 if type(parsing.ITEMS[item]['url']) is list:
                     for url in parsing.ITEMS[item]['url']:
-                        media.append(types.InputMediaPhoto(url.replace("****", num), None if media else title))
-                else: media.append(types.InputMediaPhoto(parsing.ITEMS[item]['url'].replace("****", num), title))
+                        url = url.replace("****", num)
+                        if _num: url = url.replace("***", _num)
+                        media.append(types.InputMediaPhoto(url, None if media else title))
+                else:
+                    url = parsing.ITEMS[item]['url'].replace("****", num)
+                    if _num: url = url.replace("***", _num)
+                    media.append(types.InputMediaPhoto(url, title))
                 try: await message.bot.send_media_group(message.from_user.id, media)
-                except: await message.bot.send_message(message.from_user.id, f"{get[0]}{num} не найден")
+                except: await message.bot.send_message(message.from_user.id, f"{sign}{num} не найден")
                 else: allow_ad = True
         elif parsing.SITES[parsing.ITEMS[item]['site']]['type'] == "img":
             # return type is img
             for num in nums:
-                media, title = [], f"{item.capitalize()} {get[0]}{num}"
-                for url in parsing.get_urls(item, num): media.append(types.InputMediaPhoto(url, None if media else title))
+                sign = get[3] if _num else get[0]
+                media, title = [], f"{item.capitalize()} {sign}{num}"
+                for url in parsing.get_urls(item, num, _num):
+                    media.append(types.InputMediaPhoto(url, None if media else title))
                 try: await message.bot.send_media_group(message.from_user.id, media)
-                except: await message.bot.send_message(message.from_user.id, f"{get[0]}{num} не найден")
+                except: await message.bot.send_message(message.from_user.id, f"{sign}{num} не найден")
                 else: allow_ad = True
         elif parsing.SITES[parsing.ITEMS[item]['site']]['type'] == "text":
             # return type is text
             for num in nums:
-                text, url = parsing.get_urls(item, num)
-                if not text: await message.bot.send_message(message.from_user.id, f"{get[0]}{num} не найден")
+                sign = get[3] if _num else get[0]
+                text, url = parsing.get_urls(item, num, _num)
+                if not text: await message.bot.send_message(message.from_user.id, f"{sign}{num} не найден")
                 else:
-                    await message.bot.send_message(message.from_user.id,
-                                                   text + f'\n\n<a href="{url}">{item.capitalize()} {get[0]}{num}</a>')
+                    text += f'\n\n<a href="{url}">{item.capitalize()} {sign}{num}</a>'
+                    await message.bot.send_message(message.from_user.id, text)
                     allow_ad = True
         if allow_ad:
-            db.set(message.from_user.id, "item", None)
+            db.reset(message.from_user.id)
             db.set_nums(item, nums)
             if db.ad(message.from_user.id) and AD_MESSAGE:
                 sleep(1)
@@ -112,5 +134,6 @@ async def other(message: types.Message):
             await message.bot.send_message(message.from_user.id, "⤵️ Выберите предмет:", reply_markup=kb)
         else:
             sleep(1)
+            request = get[4] if _num else get[2]
             await message.bot.send_message(message.from_user.id,
-                                            f"Напишите {get[2]} еще раз или нажмите /stop для остановки")
+                f"Напишите {request} еще раз или нажмите /stop для остановки")

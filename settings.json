@@ -1,8 +1,8 @@
 {
-  "Version": 2.2,
+  "Version": 2.3,
   "Release": "baikal",
 
-  "BOT_TOKEN": "",
+  "BOT_TOKEN": "5537568090:AAGyMrJXHo0u6WSFS0ryHD3rHjKmOkcBFE0",
   "BOT_OWNERS": [1115575390],
   "AD_MESSAGE": "💸 <b>Не забудь <a href=\"https://www.tinkoff.ru/cf/6cqRVvB73E8\">поддержать разработчика</a>!\nА то он останется без хлеба...</b>",
   "DEBUG": false,
@@ -23,7 +23,7 @@
       "sign": "⏳", "get": "§", "site": "reshak"},
     "обществознание": {"url": "https://reshak.ru/otvet/reshebniki.php?otvet=****&predmet=bogolubov8",
       "sign": "👥", "get": "§", "site": "reshak"},
-    "_химия": {"url": "https://reshak.ru/otvet/reshebniki.php?otvet=par/1/4&predmet=eremin8",
+    "химия": {"url": "https://reshak.ru/otvet/reshebniki.php?otvet=par/***/****&predmet=eremin8",
       "sign": "🧪", "get": ["§", "№"], "site": "reshak"}
   },
   "GET": {

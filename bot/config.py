@@ -1,6 +1,6 @@
 import json
 
-v, r = 2.2, "baikal"
+v, r = 2.3, "baikal"
 with open("settings.json") as file:
     JSON = json.load(file)
 

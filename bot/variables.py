@@ -11,6 +11,9 @@ class Varibles:
     def get(self, user, varible):
         try: return self.mem[user][varible]
         except: return False
+    def reset(self, user, *vars):
+        vars = vars if vars else ['item', '_num']
+        for var in vars: self.set(user, var, None)
     def set_ad(self, user):
         if not self.get(user, 'ad'):
             self.set(user, 'ad', 5)
