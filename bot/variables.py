@@ -24,8 +24,9 @@ class Varibles:
         else:
             self.set_ad(user)
             return True
-    def set_nums(self, item, nums):
-        nums = ",".join(nums)
+    def set_nums(self, item, nums, _num=None):
+        _num = _num + ":" if _num else ""
+        nums = _num + ",".join(nums)
         if item not in self.nums:
             self.nums[item] = {nums: [1, date.today()]}
         else:
@@ -38,7 +39,7 @@ class Varibles:
         nums.sort(key=lambda x: (x[1][1], x[1][0]), reverse=True)
         if len(nums) > 5:
             for i in nums[5:]: del self.nums[item][i[0]]
-        return list(map(lambda x: x[0].split(","), nums[:3]))
+        return list(map(lambda x: x[0], nums[:3]))
     def print(self):
         pprint(self.mem)
         pprint(self.nums)

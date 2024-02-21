@@ -21,7 +21,11 @@ def get_kb(item, get):
     kb_nums = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     if not db.get_nums(item): return types.ReplyKeyboardRemove()
     for line in db.get_nums(item):
-        kb_nums.add(types.KeyboardButton(", ".join(map(lambda x: get[0] + x, line))))
+        if ":" in line:
+            _num, nums = line.split(":")
+            text = get[0] + _num + ": " + ", ".join(map(lambda x: get[3] + x, nums.split(",")))
+        else: text = ", ".join(map(lambda x: get[0] + x, line.split(",")))
+        kb_nums.add(types.KeyboardButton(text))
     return kb_nums
 
 
@@ -125,7 +129,7 @@ async def other(message: types.Message):
                     allow_ad = True
         if allow_ad:
             db.reset(message.from_user.id)
-            db.set_nums(item, nums)
+            db.set_nums(item, nums, _num)
             if db.ad(message.from_user.id) and AD_MESSAGE:
                 sleep(1)
                 await message.bot.send_message(message.from_user.id, AD_MESSAGE)
