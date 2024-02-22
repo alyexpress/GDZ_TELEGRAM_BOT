@@ -32,21 +32,36 @@ def get_kb(item, get):
 @dp.message_handler(commands="start")
 async def start(message: types.Message):
     await message.bot.send_message(message.from_user.id, f"👋 Привет, {message.from_user.first_name}!")
+    db.reset(message.from_user.id)
+    db.set_ad(message.from_user.id)
     sleep(1)
     await message.bot.send_message(message.from_user.id, "⤵️ Выберите предмет:", reply_markup=kb)
-    db.set_ad(message.from_user.id)
-    db.reset(message.from_user.id)
 
 
-@dp.message_handler(commands="stop")
+@dp.message_handler(commands=["stop", "help"])
 async def stop(message: types.Message):
-    await message.bot.send_message(message.from_user.id, "⤵️ Выберите предмет:", reply_markup=kb)
     db.reset(message.from_user.id)
+    if '/help' in message.text:
+        await message.reply("help wanted", reply=False)
+        sleep(1.5)
+    await message.bot.send_message(message.from_user.id, "⤵️ Выберите предмет:", reply_markup=kb)
 
 
 @dp.message_handler(is_owner=True, commands="post")
 async def post(message: types.Message):
-    db.reset(message.from_user.id)
+    db.reset(message.from_user.id, "item", "_num")
+    if '/post' != message.text and db.get(message.from_user.id, "post"):
+        db.reset(message.from_user.id, "post")
+        for user in db.get_users():
+            if user != message.from_user.id: await message.forward(user)
+        await message.reply(f"✅ Успешно адресованно {len(db.get_users())-1} людям", reply=False)
+    else:
+        db.set(message.from_user.id, "post", True)
+        await message.reply("Напишите пост:")
+
+@dp.message_handler(content_types=['photo', 'document', 'text'])
+async def post_msg(message: types.Message):
+    if db.get(message.from_user.id, "post"): await post(message)
 
 
 @dp.message_handler()

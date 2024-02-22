@@ -12,7 +12,7 @@ class Varibles:
         try: return self.mem[user][varible]
         except: return False
     def reset(self, user, *vars):
-        vars = vars if vars else ['item', '_num']
+        vars = vars if vars else ['item', '_num', 'post']
         for var in vars: self.set(user, var, None)
     def set_ad(self, user):
         if not self.get(user, 'ad'):
@@ -40,6 +40,8 @@ class Varibles:
         if len(nums) > 5:
             for i in nums[5:]: del self.nums[item][i[0]]
         return list(map(lambda x: x[0], nums[:3]))
+    def get_users(self):
+        return list(self.mem.keys())
     def print(self):
         pprint(self.mem)
         pprint(self.nums)
